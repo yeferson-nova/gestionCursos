@@ -1,5 +1,9 @@
 package com.ynova.gestionCursos.controller;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ynova.gestionCursos.entity.Curso;
+import com.ynova.gestionCursos.reports.CursoExporterExcel;
+import com.ynova.gestionCursos.reports.CursoExporterPDF;
 import com.ynova.gestionCursos.repository.CursoRespository;
 
-
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 public class CursoController {
@@ -83,7 +89,39 @@ public class CursoController {
         }
         return "redirect:/cursos";
     }
-    
-    
+
+    @GetMapping("/export/pdf")
+    public void generarReportePDF(HttpServletResponse response) throws IOException {
+        response.setContentType("application/pdf");
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy_HH:mm:ss");
+        String currentDateTime = dateFormat.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=cursos" + " - " + currentDateTime + ".pdf";
+        response.setHeader(headerKey, headerValue);
+
+        List<Curso> cursos = respository.findAll();
+
+        CursoExporterPDF exporterPDF = new CursoExporterPDF(cursos);
+        exporterPDF.exportPDF(response);
+
+    }
+
+    @GetMapping("/export/excel")
+    public void generarReporteExcel(HttpServletResponse response) throws IOException {
+        response.setContentType("application/octet-stream");
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy_HH:mm:ss");
+        String currentDateTime = dateFormat.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=cursos" + " - " + currentDateTime + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+
+        List<Curso> cursos = respository.findAll();
+
+        CursoExporterExcel exporterExcel = new CursoExporterExcel(cursos);
+        exporterExcel.exportExcel(response);
+
+    }
 
 }

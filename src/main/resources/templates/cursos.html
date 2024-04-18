@@ -21,13 +21,20 @@
             <div th:if="${message != null}" class="alert alert-success alert-dismissible fade show text-center message">
                 [[${message}]]
                 <button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Cerrar">
-                    <span aria-hidde="true">✖</span>
+                    <span aria-hidde="true">X</span>
                 </button>
             </div>
         </div>
     </div>
 
     <div class="container">
+        <div class="row mb-3">
+            <div class="col-md-12 d-flex justify-content-start mr-5">
+                <a th:href="@{/export/pdf}" class="btn btn-danger">Generar PDF</a>
+                &nbsp;&nbsp;
+                <a th:href="@{/export/excel}" class="btn btn-success">Generar Excel</a>
+            </div>
+        </div>
 
         <table class="table table-hover table-responsive-xl">
             <thead class="thead-light">
