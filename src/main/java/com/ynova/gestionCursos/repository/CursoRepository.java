@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.ynova.gestionCursos.entity.Curso;
 
 @Repository
-public interface CursoRepository extends JpaRepository<Curso, Integer> {
+public interface CursoRepository extends JpaRepository<Curso, Long> {
 
     Page<Curso> findByTituloContainingIgnoreCase(String keyword, Pageable pageable);
 
