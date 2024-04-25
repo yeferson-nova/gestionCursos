@@ -23,7 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.ynova.gestionCursos.entity.Curso;
 import com.ynova.gestionCursos.reports.CursoExporterExcel;
 import com.ynova.gestionCursos.reports.CursoExporterPDF;
-import com.ynova.gestionCursos.repository.CursoRespository;
+import com.ynova.gestionCursos.repository.CursoRepository;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -31,7 +31,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class CursoController {
 
     @Autowired
-    private CursoRespository respository;
+    private CursoRepository respository;
 
     @GetMapping("/")
     public String home() {
@@ -40,36 +40,33 @@ public class CursoController {
     }
 
     @GetMapping("/cursos")
-    public String listarCurso(Model model, @Param("keyword") String keyword, @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "3") int size) {
-
+    public String listarCursos(Model model, @Param("keyword") String keyword,
+            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "3") int size) {
         try {
-
             List<Curso> cursos = new ArrayList<>();
-
-            Pageable paging = PageRequest.of(page, size);
+            Pageable paging = PageRequest.of(page - 1, size);
 
             Page<Curso> pageCursos = null;
 
             if (keyword == null) {
                 pageCursos = respository.findAll(paging);
             } else {
-                pageCursos = respository.findCyTituloContainingIgnoreCase(keyword, paging);
+                pageCursos = respository.findByTituloContainingIgnoreCase(keyword, paging);
                 model.addAttribute("keyword", keyword);
             }
+
             cursos = pageCursos.getContent();
+
             model.addAttribute("cursos", cursos);
-            model.addAttribute("currentPage", pageCursos.getNumber());
+
+            model.addAttribute("currentPage", pageCursos.getNumber() + 1);
             model.addAttribute("totalItems", pageCursos.getTotalElements());
-            model.addAttribute("totalPage", pageCursos.getTotalPages());
+            model.addAttribute("totalPages", pageCursos.getTotalPages());
             model.addAttribute("pageSize", size);
-        } catch (Exception e) {
-            model.addAttribute("message", e.getMessage());
+        } catch (Exception exception) {
+            model.addAttribute("message", exception.getMessage());
         }
 
-        // List<Curso> cursos = respository.findAll();
-        // cursos = respository.findAll();
-        // model.addAttribute("cursos", cursos);
         return "cursos";
     }
 
